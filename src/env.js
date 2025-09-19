@@ -32,7 +32,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     AWS_BEDROCK_KEY: process.env.AWS_BEDROCK_KEY,
-    RIOT_DEVELOPER_KEY: process.env.LEAGUE_DEVELOPER_KEY
+    RIOT_DEVELOPER_KEY: process.env.RIOT_DEVELOPER_KEY
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
