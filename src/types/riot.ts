@@ -258,3 +258,49 @@ export interface Objective {
   first: boolean;
   kills: number;
 }
+
+export interface LeagueVersionConfig {
+  n: {
+    item: string;
+    rune: string;
+    summoner: string;
+    mastery: string;
+    champion: string;
+    map: string;
+    language: string;
+    sticker: string;
+  };
+  v: string;
+  l: string;
+  cdn: string;
+  dd: string;
+  lg: string;
+  css: string;
+  profileiconmax: string;
+  store: string;
+}
+
+export interface SummonerSpellConfigRaw {
+  type: string;
+  version: string;
+  data: Record<string, SummonerSpell>;
+}
+
+export interface SummonerSpellConfig {
+  type: string;
+  version: string;
+  data: SummonerSpell[];
+}
+
+export interface SummonerSpell {
+  id: string;
+  name: string;
+  description: string;
+  tooltip: string;
+  maxrank: number;
+  cooldown: number[];
+  cooldownBurn: string;
+  cost: number[];
+  costBurn: string;
+  key: string;
+}
