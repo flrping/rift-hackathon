@@ -14,11 +14,15 @@ export const useLeague = (platform = "NA1") => {
       { enabled: !!leagueVersion }
     );
 
-  const isLoading = isLeagueVersionLoading || isSummonerSpellsLoading;
+  const { data: queues, isLoading: isQueuesLoading } =
+    api.riot.getQueues.useQuery();
+
+  const isLoading = isLeagueVersionLoading || isSummonerSpellsLoading || isQueuesLoading;
 
   return {
     version: leagueVersion,
     summonerSpells: summonerSpells,
+    queues: queues,
     isLoading,
   };
 };

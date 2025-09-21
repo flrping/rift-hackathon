@@ -7,7 +7,7 @@ import type {
   Account,
   Match,
   LeagueVersionConfig,
-  SummonerSpellConfigRaw
+  SummonerSpellConfigRaw, Queue
 } from "~/types/riot";
 import { getRegion } from "~/util/riot/region";
 
@@ -174,4 +174,17 @@ export const riotRouter = createTRPCRouter({
       const raw = (await response.json()) as SummonerSpellConfigRaw;
       return { ...raw, data: Object.values(raw.data) };
     }),
+
+    getQueues: publicProcedure
+      .query(async () => {
+        const url = `https://static.developer.riotgames.com/docs/lol/queues.json`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch queues");
+        }
+
+        return (await response.json()) as Queue[];
+      }),
+
 });

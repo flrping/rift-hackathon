@@ -304,3 +304,10 @@ export interface SummonerSpell {
   costBurn: string;
   key: string;
 }
+
+export interface Queue {
+  queueId: number;
+  map: string;
+  description: string;
+  notes: string | null;
+}
