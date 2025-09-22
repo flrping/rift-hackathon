@@ -1,3 +1,4 @@
+import { platform } from "os";
 import { z } from "zod";
 import { env } from "~/env";
 
@@ -7,7 +8,8 @@ import type {
   Account,
   Match,
   LeagueVersionConfig,
-  SummonerSpellConfigRaw, Queue
+  SummonerSpellConfigRaw, Queue,
+  LeagueEntry
 } from "~/types/riot";
 import { getRegion } from "~/util/riot/region";
 
@@ -145,6 +147,26 @@ export const riotRouter = createTRPCRouter({
       );
 
       return matches;
+    }),
+
+  getRanksByPUUID: publicProcedure
+    .input(z.object({ puuid: z.string().min(1), platform: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const apiKey = env.RIOT_DEVELOPER_KEY;
+      const region = getRegion(input.platform).toLowerCase();
+      if (region === "none") {
+        throw new Error("Invalid region");
+      }
+      const url = `https://${input.platform}.api.riotgames.com/lol/league/v4/entries/by-puuid/${input.puuid}`;
+      const response = await fetch(url, {
+        headers: {
+          "X-Riot-Token": apiKey,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch ranks");
+      }
+      return (await response.json()) as LeagueEntry[];
     }),
 
   getLeagueVersion: publicProcedure

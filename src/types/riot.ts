@@ -311,3 +311,26 @@ export interface Queue {
   description: string;
   notes: string | null;
 }
+
+export interface LeagueEntry {
+  leagueId: string;
+  puuid: string;
+  queueType: string;
+  tier: string;
+  rank: string;
+  leaguePoints: number;
+  wins: number;
+  losses: number;
+  hotStreak: boolean;
+  veteran: boolean;
+  freshBlood: boolean;
+  inactive: boolean;
+  miniSeries: MiniSeries;
+}
+
+export interface MiniSeries {
+  losses: number;
+  progress: string;
+  target: number;
+  wins: number;
+}
