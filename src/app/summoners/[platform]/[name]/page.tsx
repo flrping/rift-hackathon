@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLeague } from "~/hooks/useLeague";
 import Image from "next/image";
@@ -11,9 +11,8 @@ import FadeContainer from "~/components/FadeContainer";
 const SummonersPage = () => {
   const router = useRouter();
   const params = useParams();
-  const queryParams = useSearchParams();
   const name = params.name as string;
-  const platform = queryParams.get("region") ?? "NA1";
+  const platform = params.platform as string;
   const [gameName, tagName] = name.split("-");
 
   const [start, setStart] = useState<number>(0);
