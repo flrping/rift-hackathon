@@ -134,7 +134,7 @@ const SummonersPage = () => {
           </div>
 
           {/* Matches */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <div
               className="group relative flex min-h-[100px] w-full flex-col items-center justify-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 p-4 transition-all duration-300 hover:cursor-pointer hover:border-blue-400/50"
               onClick={handleRiftRewind}

@@ -11,16 +11,32 @@ export const getMapSide = (teamId: number) => {
 export const getQueueName = (description: string) => {
   if (!description) return "";
 
-  description = description.replace(/\b\d+v\d+\b/gi, "")
+  description = description
+    .replace(/\b\d+v\d+\b/gi, "")
     .replace(/\bgame\b/gi, "")
     .replace(/\bgames\b/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 
-  if (description === "Ranked Solo") return "Ranked Solo/Duo"
+  if (description === "Ranked Solo") return "Ranked Solo/Duo";
 
   return description;
-}
+};
+
+export const getMatchTimestamp = (timestamp: number) => {
+  const totalSeconds = Math.floor(timestamp / 1000);
+
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  if (hours > 0 && minutes > 0) {
+    return `${hours}h ${minutes}m`;
+  } else if (hours > 0) {
+    return `${hours}h`;
+  } else {
+    return `${minutes}m`;
+  }
+};
 
 export const getMatchAge = (timestamp: number) => {
   const diff = Date.now() - timestamp;
@@ -44,5 +60,3 @@ export const getMatchAge = (timestamp: number) => {
   const years = Math.floor(days / 365);
   return `${years} year${years !== 1 ? "s" : ""} ago`;
 };
-
-
