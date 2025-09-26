@@ -529,3 +529,9 @@ export interface ChampionPassive {
   description: string;
   image: ChampionImage;
 }
+
+export interface MatchOverview {
+  focus: Participant;
+  metadata: Metadata;
+  info: TimelineInfo;
+}
