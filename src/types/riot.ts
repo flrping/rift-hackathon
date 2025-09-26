@@ -16,6 +16,11 @@ export interface Match {
   info: Info;
 }
 
+export interface MatchTimeline {
+  metadata: Metadata;
+  info: TimelineInfo;
+}
+
 export interface Metadata {
   dataVersion: string;
   matchId: string;
@@ -39,6 +44,86 @@ export interface Info {
   queueId: number;
   teams: Team[];
   tournamentCode?: string;
+}
+
+export interface TimelineInfo {
+  endOfGameResult: string;
+  frameInterval: number;
+  gameId: number;
+  participants: Participant[];
+  frames: TimelineFrame[];
+}
+
+export interface TimelineFrame {
+  events: TimelineEvents[];
+  participantFrames: TimelineParticipantFrames[];
+  timestamp: number;
+}
+
+export interface TimelineEvents {
+  timestamp: number;
+  realTimestamp: number;
+  type: string;
+}
+
+export type TimelineParticipantFrames = Record<string, TimelineParticipantFrame>;
+
+export interface TimelineParticipantFrame {
+ championStats: ChampionStats;
+ currentGold: number;
+ damageStats: DamageStats;
+ goldPerSecond: number;
+ jungleMinionsKilled: number;
+ level: number;
+ minionsKilled: number;
+ participantId: number;
+ position: { x: number, y: number };
+ timeEnemySpentControlled: number;
+ totalGold: number;
+ xp: number;
+}
+
+export interface ChampionStats {
+  abilityHaste: number;
+  abilityPower: number;
+  armor: number;
+  armorPen: number;
+  armorPenPercent: number;
+  attackDamage: number;
+  attackSpeed: number;
+  bonusArmorPenPercent: number;
+  bonusMagicPenPercent: number;
+  ccReduction: number;
+  cooldownReduction: number;
+  health: number;
+  healthMax: number;
+  healthRegen: number;
+  lifesteal: number;
+  magicPen: number;
+  magicPenPercent: number;
+  magicResist: number;
+  movementSpeed: number;
+  omnivamp: number;
+  physicalVamp: number;
+  power: number;
+  powerMax: number;
+  powerRegen: number;
+  spellVamp: number;
+}
+
+export interface DamageStats {
+  magicDamageDone: number;
+  magicDamageDoneToChampions: number;
+  magicDamageTaken: number;
+  physicalDamageDone: number;
+  physicalDamageDoneToChampions: number;
+  physicalDamageTaken: number;
+  totalDamageDone: number;
+  totalDamageDoneToChampions: number;
+  totalDamageTaken: number;
+  trueDamageDone: number;
+  trueDamageDoneToChampions: number;
+  trueDamageTaken: number;
 }
 
 export interface Participant {

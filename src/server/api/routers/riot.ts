@@ -1,4 +1,3 @@
-import { platform } from "os";
 import { z } from "zod";
 import { env } from "~/env";
 
@@ -8,8 +7,10 @@ import type {
   Account,
   Match,
   LeagueVersionConfig,
-  SummonerSpellConfigRaw, Queue,
-  LeagueEntry
+  SummonerSpellConfigRaw,
+  Queue,
+  LeagueEntry,
+  MatchTimeline,
 } from "~/types/riot";
 import { getRegion } from "~/util/riot/region";
 
@@ -114,6 +115,28 @@ export const riotRouter = createTRPCRouter({
       }
 
       return (await response.json()) as Match;
+    }),
+
+  getMatchTimelineByGameId: publicProcedure
+    .input(z.object({ id: z.string().min(1), platform: z.string().min(1) }))
+    .query(async ({ input }) => {
+      const apiKey = env.RIOT_DEVELOPER_KEY;
+      const region = getRegion(input.platform).toLowerCase();
+      if (region === "none") {
+        throw new Error("Invalid region");
+      }
+      const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/${input.platform.replace("/\d/g", "")}_${input.id}/timeline`;
+      const response = await fetch(url, {
+        headers: {
+          "X-Riot-Token": apiKey,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch match");
+      }
+
+      return (await response.json()) as MatchTimeline;
     }),
 
   getMatchesByGameIds: publicProcedure
