@@ -8,7 +8,11 @@ export const env = createEnv({
    */
   server: {
     DATABASE_URL: z.string().url(),
+    AWS_REGION: z.string(),
+    AWS_ACCESS_KEY_ID: z.string(),
+    AWS_SECRET_ACCESS_KEY: z.string(),
     AWS_BEDROCK_KEY: z.string(),
+    AWS_BEDROCK_MODEL_ID: z.string(),
     RIOT_DEVELOPER_KEY: z.string(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -31,8 +35,12 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
     AWS_BEDROCK_KEY: process.env.AWS_BEDROCK_KEY,
-    RIOT_DEVELOPER_KEY: process.env.RIOT_DEVELOPER_KEY
+    AWS_BEDROCK_MODEL_ID: process.env.AWS_BEDROCK_MODEL_ID,
+    RIOT_DEVELOPER_KEY: process.env.RIOT_DEVELOPER_KEY,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**

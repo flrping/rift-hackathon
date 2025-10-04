@@ -7,6 +7,8 @@ import Image from "next/image";
 import MatchCard from "~/components/MatchCard";
 import { useSummoner } from "~/hooks/useSummoner";
 import FadeContainer from "~/components/FadeContainer";
+import {useMatch} from "~/hooks/useMatch";
+import {type CommonQueueType, getQueueName, QUEUE_ALIASES} from "~/util/riot/game";
 
 const SummonersPage = () => {
   const router = useRouter();
@@ -14,22 +16,33 @@ const SummonersPage = () => {
   const name = params.name as string;
   const platform = params.platform as string;
   const [gameName, tagName] = name.split("-");
-
+  
   const [start, setStart] = useState<number>(0);
   const [count, setCount] = useState<number>(10);
-
-  const [rankTab, setRankTab] = useState<"RANKED_SOLO_5x5" | "RANKED_FLEX_SR">(
-    "RANKED_SOLO_5x5",
-  );
+  const [rankTab, setRankTab] = useState<"RANKED_SOLO_5x5" | "RANKED_FLEX_SR">("RANKED_SOLO_5x5");
+  const [queueType, setQueueType] = useState<CommonQueueType>("ALL");
 
   const league = useLeague(platform);
+  const selectedQueue = league?.queues?.find((queue) =>
+    QUEUE_ALIASES[queueType].some(
+      (alias) =>
+        getQueueName(queue.description).toUpperCase() == alias.toUpperCase(),
+    ),
+  );
+
   const summoner = useSummoner({
     platform,
     name: gameName ?? "",
     tag: tagName ?? "",
+  });
+
+  const match = useMatch({
+    platform,
+    puuid: summoner?.account?.puuid ?? "",
     start,
     count,
-  });
+    queue: selectedQueue?.queueId ?? -1
+  })
 
   if ((!summoner.account || !summoner.summoner) && !summoner.isLoading) {
     return <div>Account not found</div>;
@@ -40,7 +53,7 @@ const SummonersPage = () => {
   }
 
   const handleRiftRewind = () => {
-    router.push(`/rift-rewind?puuid=${summoner.account?.puuid}`);
+    router.push(`/summoners/${platform}/${name}/rewind`);
   };
 
   return (
@@ -150,13 +163,13 @@ const SummonersPage = () => {
             </div>
             <div className="flex w-full flex-col gap-2 rounded-lg border border-slate-600/30 bg-slate-700/50 p-4">
               <div className="space-y-2">
-                {summoner.processedMatches.length === 0 &&
+                {match.processedMatches.length === 0 &&
                 !summoner.isLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <span className="text-slate-400">No matches found</span>
                   </div>
                 ) : (
-                  summoner.processedMatches
+                  match.processedMatches
                     .filter(
                       (match) => match.info.endOfGameResult === "GameComplete",
                     )

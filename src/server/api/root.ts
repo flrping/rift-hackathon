@@ -1,5 +1,6 @@
 import { awsRouter } from "~/server/api/routers/aws";
 import { riotRouter } from "~/server/api/routers/riot";
+import { rewindRouter } from "~/server/api/routers/rewind";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
@@ -10,6 +11,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 export const appRouter = createTRPCRouter({
   riot: riotRouter,
   aws: awsRouter,
+  rewind: rewindRouter,
 });
 
 // export type definition of API

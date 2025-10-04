@@ -13,6 +13,7 @@ import type {
   MatchTimeline,
   Champion,
   ChampionConfig,
+  ItemData,
 } from "~/types/riot";
 import { SimpleCache } from "~/util/cache/cache";
 import { getRegion } from "~/util/riot/region";
@@ -35,6 +36,7 @@ const spellsCache = new SimpleCache<
 >(CACHE_TTL);
 const queuesCache = new SimpleCache<Queue[]>(CACHE_TTL);
 const championCache = new SimpleCache<Champion>(CACHE_TTL);
+const itemsCache = new SimpleCache<ItemData>(CACHE_TTL);
 
 export const riotRouter = createTRPCRouter({
   getAccountByNameAndTag: publicProcedure
@@ -68,7 +70,7 @@ export const riotRouter = createTRPCRouter({
       });
     }),
 
-  getSummonerByPUUID: publicProcedure
+  getSummonerByPuuid: publicProcedure
     .input(z.object({ id: z.string().min(78), platform: z.string().min(1) }))
     .query(async ({ input }) => {
       const cacheKey = `${input.id}-${input.platform}`;
@@ -94,24 +96,41 @@ export const riotRouter = createTRPCRouter({
       });
     }),
 
-  getMatchesByPUUID: publicProcedure
+  getMatchesByPuuid: publicProcedure
     .input(
       z.object({
         id: z.string().min(78),
         platform: z.string().min(1),
+        startTime: z.number().int().optional(),
+        endTime: z.number().int().optional(),
         start: z.number().default(0).optional(),
         count: z.number().default(10).optional(),
+        queue: z.number().int().optional(),
       }),
     )
     .query(async ({ input }) => {
-      const cacheKey = `${input.id}-${input.platform}-${input.start}-${input.count}`;
+      const cacheKey = `${input.id}-${input.platform}-${input.start}-${input.count}-${input.startTime ?? "none"}-${input.endTime ?? "none"}`;
+
       return await matchesCache.getOrLoad(cacheKey, async () => {
         const apiKey = env.RIOT_DEVELOPER_KEY;
         const region = getRegion(input.platform).toLowerCase();
         if (region === "none") {
           throw new Error("Invalid region");
         }
-        const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.id}/ids?start=${input.start}&count=${input.count}`;
+
+        let url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.id}/ids?start=${input.start}&count=${input.count}`;
+        if (input.startTime !== undefined) {
+          url += `&startTime=${input.startTime}`;
+        }
+        if (input.endTime !== undefined) {
+          url += `&endTime=${input.endTime}`;
+        }
+        if (input.queue !== undefined && input.queue !== -1) {
+          url += `&queue=${input.queue}`;
+        }
+
+        console.log(url);
+
         const response = await fetch(url, {
           headers: {
             "X-Riot-Token": apiKey,
@@ -119,11 +138,62 @@ export const riotRouter = createTRPCRouter({
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch matches");
+          throw new Error(
+            `Failed to fetch matches: ${response.status} ${response.statusText}`,
+          );
         }
 
         return (await response.json()) as string[];
       });
+    }),
+
+  getMatchesByPuuidAndMonths: publicProcedure
+    .input(
+      z.object({
+        id: z.string().min(78),
+        platform: z.string().min(1),
+        queue: z.number().int().optional(),
+        months: z.array(
+          z.object({
+            startTime: z.number().int(),
+            endTime: z.number().int(),
+            month: z.number().int(),
+          }),
+        ),
+        count: z.number().default(20).optional(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const apiKey = env.RIOT_DEVELOPER_KEY;
+      const region = getRegion(input.platform).toLowerCase();
+      if (region === "none") {
+        throw new Error("Invalid region");
+      }
+
+      const results: { month: number; matches: string[] }[] = [];
+
+      for (const m of input.months) {
+        const cacheKey = `${input.id}-${input.platform}-${m.startTime}-${m.endTime}-${input.count}`;
+        const matches = await matchesCache.getOrLoad(cacheKey, async () => {
+          let url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.id}/ids?count=${input.count}&startTime=${m.startTime}&endTime=${m.endTime}`;
+          if (input.queue !== undefined && input.queue !== -1) {
+            url += `&queue=${input.queue}`;
+          }
+          const res = await fetch(url, {
+            headers: { "X-Riot-Token": apiKey },
+          });
+          if (!res.ok) {
+            throw new Error(
+              `Failed to fetch matches for month ${m.month}: ${res.status} ${res.statusText}`,
+            );
+          }
+          return (await res.json()) as string[];
+        });
+
+        results.push({ month: m.month, matches });
+      }
+
+      return results;
     }),
 
   getMatchByGameId: publicProcedure
@@ -212,7 +282,7 @@ export const riotRouter = createTRPCRouter({
       return matches;
     }),
 
-  getRanksByPUUID: publicProcedure
+  getRanksByPuuid: publicProcedure
     .input(z.object({ puuid: z.string().min(1), platform: z.string().min(1) }))
     .query(async ({ input }) => {
       const cacheKey = `${input.puuid}-${input.platform}-ranks`;
@@ -311,5 +381,21 @@ export const riotRouter = createTRPCRouter({
       }
       championCache.set(input.name, champion);
       return champion;
+    }),
+
+  getItems: publicProcedure
+    .input(
+      z.object({ version: z.string().min(1), language: z.string().min(1) }),
+    )
+    .query(async ({ input }) => {
+      const cacheKey = `items-${input.version}-${input.language}`;
+      return await itemsCache.getOrLoad(cacheKey, async () => {
+        const url = `https://ddragon.leagueoflegends.com/cdn/${input.version}/data/${input.language}/item.json`;
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Failed to fetch items");
+        }
+        return (await response.json()) as ItemData;
+      });
     }),
 });

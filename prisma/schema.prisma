@@ -2,19 +2,54 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Rewind {
+  id        Int      @id @default(autoincrement())
+  puuid     String
+  platform  String
+  queueType String
+  year      Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    @@index([name])
+  playstyle        Playstyle         @relation(fields: [playstyleId], references: [id])
+  playstyleId      Int               @unique
+  gameplayElements GameplayElement[]
+  advice           Advice[]
+
+  @@unique([puuid, platform, queueType, year])
+}
+
+model Playstyle {
+  id     Int    @id @default(autoincrement())
+  type   String
+  reason String
+
+  Rewind Rewind?
+}
+
+model GameplayElement {
+  id     Int    @id @default(autoincrement())
+  type   String
+  form   String
+  reason String
+
+  Rewind   Rewind? @relation(fields: [rewindId], references: [id])
+  rewindId Int?
+}
+
+model Advice {
+  id     Int    @id @default(autoincrement())
+  type   String
+  reason String
+
+  Rewind   Rewind? @relation(fields: [rewindId], references: [id])
+  rewindId Int?
 }

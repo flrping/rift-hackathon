@@ -531,7 +531,191 @@ export interface ChampionPassive {
 }
 
 export interface MatchOverview {
-  focus: Participant;
-  metadata: Metadata;
-  info: TimelineInfo;
+  gameDuration: number;
+  me: ParticipantPerformance;
+  opponent: ParticipantPerformance;
+  game: {
+    duration: number;
+    version: string;
+  };
+  teams: {
+    red: {
+      champions: string[];
+      kills: number;
+      deaths: number;
+      assists: number;
+      gold: number;
+    };
+    blue: {
+      champions: string[];
+      kills: number;
+      deaths: number;
+      assists: number;
+      gold: number;
+    };
+  };
+}
+
+export interface ParticipantPerformance {
+  championName: string;
+  kills: number;
+  deaths: number;
+  assists: number;
+  cs: number;
+  gold: number;
+  level: number;
+  totalPings: number;
+  consumablesPurchased: number;
+  wardsPlaced: number;
+  dragonKills: number;
+  turretKills: number;
+  inhibitorKills: number;
+  damageDealt: number;
+  damageTaken: number;
+  win: boolean;
+  item0: string;
+  item1: string;
+  item2: string;
+  item3: string;
+  item4: string;
+  item5: string;
+  item6: string;
+  lane: string;
+}
+
+export interface ItemStats {
+  FlatHPPoolMod?: number;
+  rFlatHPModPerLevel?: number;
+  FlatMPPoolMod?: number;
+  rFlatMPModPerLevel?: number;
+  PercentHPPoolMod?: number;
+  PercentMPPoolMod?: number;
+  FlatHPRegenMod?: number;
+  rFlatHPRegenModPerLevel?: number;
+  PercentHPRegenMod?: number;
+  FlatMPRegenMod?: number;
+  rFlatMPRegenModPerLevel?: number;
+  PercentMPRegenMod?: number;
+  FlatArmorMod?: number;
+  rFlatArmorModPerLevel?: number;
+  PercentArmorMod?: number;
+  rFlatArmorPenetrationMod?: number;
+  rFlatArmorPenetrationModPerLevel?: number;
+  rPercentArmorPenetrationMod?: number;
+  rPercentArmorPenetrationModPerLevel?: number;
+  FlatPhysicalDamageMod?: number;
+  rFlatPhysicalDamageModPerLevel?: number;
+  PercentPhysicalDamageMod?: number;
+  FlatMagicDamageMod?: number;
+  rFlatMagicDamageModPerLevel?: number;
+  PercentMagicDamageMod?: number;
+  FlatMovementSpeedMod?: number;
+  rFlatMovementSpeedModPerLevel?: number;
+  PercentMovementSpeedMod?: number;
+  rPercentMovementSpeedModPerLevel?: number;
+  FlatAttackSpeedMod?: number;
+  PercentAttackSpeedMod?: number;
+  rPercentAttackSpeedModPerLevel?: number;
+  rFlatDodgeMod?: number;
+  rFlatDodgeModPerLevel?: number;
+  PercentDodgeMod?: number;
+  FlatCritChanceMod?: number;
+  rFlatCritChanceModPerLevel?: number;
+  PercentCritChanceMod?: number;
+  FlatCritDamageMod?: number;
+  rFlatCritDamageModPerLevel?: number;
+  PercentCritDamageMod?: number;
+  FlatBlockMod?: number;
+  PercentBlockMod?: number;
+  FlatSpellBlockMod?: number;
+  rFlatSpellBlockModPerLevel?: number;
+  PercentSpellBlockMod?: number;
+  FlatEXPBonus?: number;
+  PercentEXPBonus?: number;
+  rPercentCooldownMod?: number;
+  rPercentCooldownModPerLevel?: number;
+  rFlatTimeDeadMod?: number;
+  rFlatTimeDeadModPerLevel?: number;
+  rPercentTimeDeadMod?: number;
+  rPercentTimeDeadModPerLevel?: number;
+  rFlatGoldPer10Mod?: number;
+  rFlatMagicPenetrationMod?: number;
+  rFlatMagicPenetrationModPerLevel?: number;
+  rPercentMagicPenetrationMod?: number;
+  rPercentMagicPenetrationModPerLevel?: number;
+  FlatEnergyRegenMod?: number;
+  rFlatEnergyRegenModPerLevel?: number;
+  FlatEnergyPoolMod?: number;
+  rFlatEnergyModPerLevel?: number;
+  PercentLifeStealMod?: number;
+  PercentSpellVampMod?: number;
+}
+
+export interface ItemImage {
+  full: string;
+  sprite: string;
+  group: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface ItemGold {
+  base: number;
+  total: number;
+  sell: number;
+  purchasable: boolean;
+}
+
+export interface ItemRune {
+  isrune: boolean;
+  tier: number;
+  type: string;
+}
+
+export interface ItemBasic {
+  name: string;
+  rune: ItemRune;
+  gold: ItemGold;
+  group: string;
+  description: string;
+  colloq: string;
+  plaintext: string;
+  consumed: boolean;
+  stacks: number;
+  depth: number;
+  consumeOnFull: boolean;
+  from: string[];
+  into: string[];
+  specialRecipe: number;
+  inStore: boolean;
+  hideFromAll: boolean;
+  requiredChampion: string;
+  requiredAlly: string;
+  stats: ItemStats;
+  tags: string[];
+  maps: Record<string, boolean>;
+}
+
+export interface Item {
+  name: string;
+  description: string;
+  colloq: string;
+  plaintext: string;
+  from?: string[];
+  into?: string[];
+  image: ItemImage;
+  gold: ItemGold;
+  tags: string[];
+  maps: Record<string, boolean>;
+  stats: ItemStats;
+  depth?: number;
+}
+
+export interface ItemData {
+  type: string;
+  version: string;
+  basic: ItemBasic;
+  data: Record<string, Item>;
 }
