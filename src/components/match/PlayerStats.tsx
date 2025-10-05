@@ -14,7 +14,7 @@ const PlayerStats = ({
   const csPerMinute = (totalCS / matchDurationMinutes).toFixed(1);
 
   return (
-    <div className="flex w-full min-w-0 flex-col items-center justify-center gap-1 lg:w-40">
+    <div className="flex flex-8 flex-col justify-center gap-1 lg:w-40">
       <div className="text-md font-semibold">
         <span className="text-green-400">{participant.kills}</span> /{" "}
         <span className="text-red-400">{participant.deaths}</span> /{" "}

@@ -27,7 +27,7 @@ const PlayerInfo = ({
   );
 
   return (
-    <div className="flex w-full min-w-0 flex-row items-center justify-start gap-2 lg:w-64 lg:justify-center">
+    <div className="flex flex-16 flex-row items-center justify-center gap-2">
       <div className="relative">
         <Image
           src={`https://ddragon.leagueoflegends.com/cdn/${version.v}/img/champion/${participant.championName}.png`}
@@ -87,7 +87,7 @@ const PlayerInfo = ({
       </div>
 
       {/* Extra Item (Trinket) */}
-      <div className="grid grid-cols-3 grid-rows-2 gap-0.5">
+      <div className="flex">
         {(() => {
           const itemId = participant.item6;
 

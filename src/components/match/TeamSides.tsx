@@ -21,7 +21,7 @@ const TeamSides = ({
   gameId,
 }: TeamSidesProps) => {
   return (
-    <div className="hidden w-full min-w-0 flex-row gap-2 overflow-hidden md:flex lg:w-64 lg:gap-3">
+    <div className="hidden flex-16 flex-row gap-2 overflow-hidden md:flex lg:w-64 lg:gap-3">
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         {blueSide.map((participant) => (
           <div

@@ -17,7 +17,7 @@ const MatchInfo = ({
   win,
 }: MatchInfoProps) => {
   return (
-    <div className="flex w-full flex-row items-center justify-between gap-2 lg:w-32 lg:flex-col lg:justify-center">
+    <div className="flex flex-8 flex-row items-center justify-between gap-2 lg:flex-col lg:justify-center">
       <div className="flex flex-col items-start lg:items-center">
         <h3
           className="glow-text text-sm font-medium"
