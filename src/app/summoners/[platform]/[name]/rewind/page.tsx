@@ -3,13 +3,7 @@
 import { useParams } from "next/navigation";
 import { useLeague } from "~/hooks/useLeague";
 import { useState, useEffect, useCallback } from "react";
-import {
-  type CommonQueueType,
-  getMonthlyRanges,
-  convertMatchesToPerformances,
-  QUEUE_IDS,
-} from "~/util/riot/game";
-import type { MatchOverview } from "~/types/riot";
+import { type CommonQueueType } from "~/util/riot/game";
 import { api } from "~/trpc/react";
 import { useSummoner } from "~/hooks/useSummoner";
 import RewindQueueTypeSection from "~/components/rewind/RewindQueueTypeSection";
@@ -40,42 +34,7 @@ const RewindPage = () => {
   const [queueType, setQueueType] = useState<CommonQueueType | null>(null);
 
   const league = useLeague(platform);
-  const selectedQueueId = queueType === null ? null : QUEUE_IDS[queueType];
-
   const summoner = useSummoner({ platform, name: gameName, tag: tagName });
-
-  const ranges = getMonthlyRanges(new Date().getFullYear()).slice(
-    0,
-    new Date().getMonth() + 1,
-  );
-  const { data: matchIdsByMonth, isLoading: isMatchIdsLoading } =
-    api.riot.getMatchesByPuuidAndMonths.useQuery(
-      {
-        id: summoner?.puuid ?? "",
-        queue: selectedQueueId ?? -1,
-        platform,
-        months: ranges,
-        count: 10,
-      },
-      {
-        enabled: !!summoner?.puuid && queueType !== null,
-      },
-    );
-  const { data: matchData, isLoading: IsMatchDataLoading } =
-    api.riot.getMatchesByGameIds.useQuery(
-      {
-        platform,
-        ids: matchIdsByMonth?.flatMap((month) => month.matches) ?? [],
-      },
-      {
-        enabled:
-          !isMatchIdsLoading && !!matchIdsByMonth && matchIdsByMonth.length > 0,
-      },
-    );
-
-  const [matches, setMatches] = useState<
-    { month: string; performances: MatchOverview[] }[]
-  >([]);
   const [stage, setStage] = useState<RewindStageType>("initial");
 
   const { data: existingRewind } = api.rewind.getExistingRewind.useQuery(
@@ -96,18 +55,6 @@ const RewindPage = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingRewind]);
-
-  useEffect(() => {
-    if (matchData && matchIdsByMonth && summoner?.puuid) {
-      const restructuredData = convertMatchesToPerformances(
-        matchData,
-        matchIdsByMonth,
-        summoner.puuid,
-        league.items,
-      ).filter((match) => match.performances.length > 0);
-      setMatches(restructuredData);
-    }
-  }, [matchData, matchIdsByMonth, summoner?.puuid, league.items]);
 
   const handleInitialOk = useCallback(() => {
     setStage("queueType");
@@ -151,13 +98,13 @@ const RewindPage = () => {
           handleQueueTypeSelection={handleQueueTypeSelection}
         />
       )}
-      {stage === "generation" && (
+      {stage === "generation" && queueType && (
         <RewindGenerationSection
           handleGenerationOk={handleGenerationOk}
-          matches={matches}
           puuid={summoner?.puuid ?? ""}
           platform={platform}
-          queueType={queueType ?? ""}
+          queueType={queueType}
+          items={league.items}
         />
       )}
       {stage === "playstyle" &&

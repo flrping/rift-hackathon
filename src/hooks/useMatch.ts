@@ -19,7 +19,7 @@ export const useMatch = ({
   endTime,
   start,
   count,
-  queue
+  queue,
 }: MatchProps) => {
   const { data: matchIds, isLoading: isMatchIdsLoading } =
     api.riot.getMatchesByPuuid.useQuery(
@@ -50,7 +50,6 @@ export const useMatch = ({
 
   return {
     processedMatches,
-    isLoading
-  }
-
+    isLoading,
+  };
 };

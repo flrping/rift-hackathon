@@ -126,36 +126,42 @@ export const findOpponent = (
 
 export const convertToParticipantPerformance = (
   participant: Participant,
+  gameDuration: number,
+  teamKills: number,
   items?: ItemData,
 ): ParticipantPerformance => {
+  const cs = participant.totalMinionsKilled + participant.neutralMinionsKilled;
+  const gold = participant.goldEarned;
+  const gameMinutes = gameDuration / 60;
+
   return {
-    championName: participant.championName,
-    kills: participant.kills,
-    deaths: participant.deaths,
-    assists: participant.assists,
-    cs: participant.totalMinionsKilled + participant.neutralMinionsKilled,
-    gold: participant.goldEarned,
-    level: participant.champLevel,
+    championName: participant.championName ?? "",
+    kills: participant.kills ?? 0,
+    deaths: participant.deaths ?? 0,
+    assists: participant.assists ?? 0,
+    cs,
+    gold,
+    level: participant.champLevel ?? 0,
     totalPings:
-      participant.allInPings +
-      participant.assistMePings +
-      participant.commandPings +
-      participant.enemyMissingPings +
-      participant.enemyVisionPings +
-      participant.getBackPings +
-      participant.holdPings +
-      participant.needVisionPings +
-      participant.onMyWayPings +
-      participant.pushPings +
-      participant.visionClearedPings,
-    consumablesPurchased: participant.consumablesPurchased,
-    wardsPlaced: participant.wardsPlaced,
-    dragonKills: participant.dragonKills,
-    turretKills: participant.turretKills,
-    inhibitorKills: participant.inhibitorKills,
-    damageDealt: participant.totalDamageDealtToChampions,
-    damageTaken: participant.totalDamageTaken,
-    win: participant.win,
+      (participant.allInPings ?? 0) +
+      (participant.assistMePings ?? 0) +
+      (participant.commandPings ?? 0) +
+      (participant.enemyMissingPings ?? 0) +
+      (participant.enemyVisionPings ?? 0) +
+      (participant.getBackPings ?? 0) +
+      (participant.holdPings ?? 0) +
+      (participant.needVisionPings ?? 0) +
+      (participant.onMyWayPings ?? 0) +
+      (participant.pushPings ?? 0) +
+      (participant.visionClearedPings ?? 0),
+    consumablesPurchased: participant.consumablesPurchased ?? 0,
+    wardsPlaced: participant.wardsPlaced ?? 0,
+    dragonKills: participant.dragonKills ?? 0,
+    turretKills: participant.turretKills ?? 0,
+    inhibitorKills: participant.inhibitorKills ?? 0,
+    damageDealt: participant.totalDamageDealtToChampions ?? 0,
+    damageTaken: participant.totalDamageTaken ?? 0,
+    win: !!participant.win,
     item0: items?.data?.[participant.item0]?.name ?? "",
     item1: items?.data?.[participant.item1]?.name ?? "",
     item2: items?.data?.[participant.item2]?.name ?? "",
@@ -166,7 +172,48 @@ export const convertToParticipantPerformance = (
     lane:
       participant.individualPosition ||
       participant.teamPosition ||
-      participant.lane,
+      participant.lane ||
+      "",
+    visionScore: participant.visionScore ?? 0,
+    controlWardsPlaced: participant.detectorWardsPlaced ?? 0,
+    wardsKilled: participant.wardsKilled ?? 0,
+    controlWardsPurchased: participant.visionWardsBoughtInGame ?? 0,
+    damageToObjectives: participant.damageDealtToObjectives ?? 0,
+    damageToBuildings: participant.damageDealtToBuildings ?? 0,
+    damageMitigated: participant.damageSelfMitigated ?? 0,
+    ccTime: participant.timeCCingOthers ?? 0,
+    timeSpentDead: participant.totalTimeSpentDead ?? 0,
+    doubleKills: participant.doubleKills ?? 0,
+    tripleKills: participant.tripleKills ?? 0,
+    quadraKills: participant.quadraKills ?? 0,
+    pentaKills: participant.pentaKills ?? 0,
+    firstBlood: !!participant.firstBloodKill,
+    firstBloodAssist: !!participant.firstBloodAssist,
+    firstTower: !!(participant.firstTowerKill || participant.firstTowerAssist),
+    goldSpent: participant.goldSpent ?? 0,
+    allyJungleFarm: participant.totalAllyJungleMinionsKilled ?? 0,
+    enemyJungleFarm: participant.totalEnemyJungleMinionsKilled ?? 0,
+    objectiveSteals:
+      (participant.objectivesStolen ?? 0) +
+      (participant.objectivesStolenAssists ?? 0),
+    healsToAllies: participant.totalHealsOnTeammates ?? 0,
+    shieldsToAllies: participant.totalDamageShieldedOnTeammates ?? 0,
+    baronKills: participant.baronKills ?? 0,
+    bountyLevel: participant.bountyLevel ?? 0,
+    killingSprees: participant.killingSprees ?? 0,
+    gameSurrendered: !!(
+      participant.gameEndedInSurrender || participant.gameEndedInEarlySurrender
+    ),
+    killParticipation:
+      teamKills > 0
+        ? (((participant.kills ?? 0) + (participant.assists ?? 0)) /
+            teamKills) *
+          100
+        : 0,
+    csPerMinute: gameMinutes > 0 ? cs / gameMinutes : 0,
+    goldPerMinute: gameMinutes > 0 ? gold / gameMinutes : 0,
+    damagePerGold:
+      gold > 0 ? (participant.totalDamageDealtToChampions ?? 0) / gold : 0,
   };
 };
 
@@ -198,10 +245,33 @@ export const convertMatchesToPerformances = (
           (p) => p.teamId === 100,
         );
 
+        const myTeamParticipants =
+          me.teamId === 200 ? redParticipants : blueParticipants;
+        const myTeamKills = myTeamParticipants.reduce(
+          (sum, p) => sum + p.kills,
+          0,
+        );
+        const opponentTeamParticipants =
+          opponent.teamId === 200 ? redParticipants : blueParticipants;
+        const opponentTeamKills = opponentTeamParticipants.reduce(
+          (sum, p) => sum + p.kills,
+          0,
+        );
+
         return {
           gameDuration: match.info.gameDuration,
-          me: convertToParticipantPerformance(me, items),
-          opponent: convertToParticipantPerformance(opponent, items),
+          me: convertToParticipantPerformance(
+            me,
+            match.info.gameDuration,
+            myTeamKills,
+            items,
+          ),
+          opponent: convertToParticipantPerformance(
+            opponent,
+            match.info.gameDuration,
+            opponentTeamKills,
+            items,
+          ),
           game: {
             duration: match.info.gameDuration,
             version: match.info.gameVersion,

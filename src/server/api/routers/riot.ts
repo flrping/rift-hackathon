@@ -17,6 +17,8 @@ import type {
 } from "~/types/riot";
 import { SimpleCache } from "~/util/cache/cache";
 import { getRegion } from "~/util/riot/region";
+import { riotRateLimiter } from "~/util/rateLimiter";
+import { observable } from "@trpc/server/observable";
 
 const CACHE_TTL = 1000 * 60 * 60 * 24;
 
@@ -280,6 +282,142 @@ export const riotRouter = createTRPCRouter({
       );
 
       return matches;
+    }),
+
+  getMatchesByGameIdsWithProgress: publicProcedure
+    .input(
+      z.object({
+        ids: z.array(z.string().min(1)),
+        platform: z.string().min(1),
+      }),
+    )
+    .subscription(async ({ input }) => {
+      return observable<{
+        type: "progress" | "complete" | "error";
+        progress?: number;
+        current?: number;
+        total?: number;
+        match?: Match;
+        matches?: Match[];
+        error?: string;
+        rateLimitStatus?: {
+          shortWindow: { used: number; limit: number; remaining: number };
+          longWindow: { used: number; limit: number; remaining: number };
+        };
+      }>((emit) => {
+        const matches: Match[] = [];
+        const total = input.ids.length;
+        let closed = false;
+
+        void (async () => {
+          try {
+            for (let i = 0; i < input.ids.length; i++) {
+              if (closed) {
+                break;
+              }
+              const id = input.ids[i]!;
+              const cacheKey = `${id}-${input.platform}`;
+
+              const cached = matchCache.get(cacheKey);
+              let match: Match;
+
+              if (cached) {
+                match = cached;
+              } else {
+                await riotRateLimiter.acquireSlot();
+
+                const apiKey = env.RIOT_DEVELOPER_KEY;
+                const region = getRegion(input.platform).toLowerCase();
+                if (region === "none") {
+                  throw new Error("Invalid region");
+                }
+
+                const url = `https://${region}.api.riotgames.com/lol/match/v5/matches/${id}`;
+                const response = await fetch(url, {
+                  headers: {
+                    "X-Riot-Token": apiKey,
+                  },
+                });
+
+                if (!response.ok) {
+                  if (response.status === 429) {
+                    const retryAfter = response.headers.get("Retry-After");
+                    const waitTime = retryAfter
+                      ? parseInt(retryAfter) * 1000
+                      : 5000;
+
+                    console.warn(`Rate limited, retrying after ${waitTime}ms`);
+                    await new Promise((resolve) =>
+                      setTimeout(resolve, waitTime),
+                    );
+
+                    const retryResponse = await fetch(url, {
+                      headers: { "X-Riot-Token": apiKey },
+                    });
+
+                    if (!retryResponse.ok) {
+                      throw new Error(
+                        `Failed to fetch match after retry: ${retryResponse.status}`,
+                      );
+                    }
+
+                    match = (await retryResponse.json()) as Match;
+                  } else {
+                    throw new Error(
+                      `Failed to fetch match: ${response.status}`,
+                    );
+                  }
+                } else {
+                  match = (await response.json()) as Match;
+                }
+
+                matchCache.set(cacheKey, match);
+              }
+
+              matches.push(match);
+
+              if (!closed) {
+                emit.next({
+                  type: "progress",
+                  progress: ((i + 1) / total) * 100,
+                  current: i + 1,
+                  total,
+                  match,
+                  rateLimitStatus: riotRateLimiter.getStatus(),
+                });
+              }
+            }
+
+            if (!closed) {
+              emit.next({
+                type: "complete",
+                matches,
+                progress: 100,
+                current: total,
+                total,
+              });
+
+              emit.complete();
+            }
+          } catch (error) {
+            if (!closed) {
+              emit.next({
+                type: "error",
+                error:
+                  error instanceof Error
+                    ? error.message
+                    : "Unknown error occurred",
+              });
+
+              emit.complete();
+            }
+          }
+        })();
+
+        return () => {
+          closed = true;
+        };
+      });
     }),
 
   getRanksByPuuid: publicProcedure

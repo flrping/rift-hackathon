@@ -581,6 +581,50 @@ export interface ParticipantPerformance {
   item5: string;
   item6: string;
   lane: string;
+
+  // Vision Control
+  visionScore: number;
+  controlWardsPlaced: number;
+  wardsKilled: number;
+  controlWardsPurchased: number;
+
+  // Combat Effectiveness
+  damageToObjectives: number;
+  damageToBuildings: number;
+  damageMitigated: number;
+  ccTime: number;
+  timeSpentDead: number;
+  doubleKills: number;
+  tripleKills: number;
+  quadraKills: number;
+  pentaKills: number;
+
+  // Early Game
+  firstBlood: boolean;
+  firstBloodAssist: boolean;
+  firstTower: boolean;
+
+  // Resource Management
+  goldSpent: number;
+  allyJungleFarm: number;
+  enemyJungleFarm: number;
+  objectiveSteals: number;
+
+  // Teamplay
+  healsToAllies: number;
+  shieldsToAllies: number;
+
+  // Context
+  baronKills: number;
+  bountyLevel: number;
+  killingSprees: number;
+  gameSurrendered: boolean;
+
+  // Efficiency Metrics
+  killParticipation: number;
+  csPerMinute: number;
+  goldPerMinute: number;
+  damagePerGold: number;
 }
 
 export interface ItemStats {

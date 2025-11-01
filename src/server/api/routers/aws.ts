@@ -5,8 +5,8 @@ import { bedrock } from "~/server/bedrock";
 import { ConverseCommand } from "@aws-sdk/client-bedrock-runtime";
 import path from "path";
 import fs from "fs";
-import type {QueryResponse} from "~/types/aws";
-import {env} from "~/env";
+import type { QueryResponse } from "~/types/aws";
+import { env } from "~/env";
 
 const ParticipantPerformanceSchema = z.object({
   championName: z.string(),
@@ -33,6 +33,36 @@ const ParticipantPerformanceSchema = z.object({
   item5: z.string(),
   item6: z.string(),
   lane: z.string(),
+  visionScore: z.number(),
+  controlWardsPlaced: z.number(),
+  wardsKilled: z.number(),
+  controlWardsPurchased: z.number(),
+  damageToObjectives: z.number(),
+  damageToBuildings: z.number(),
+  damageMitigated: z.number(),
+  ccTime: z.number(),
+  timeSpentDead: z.number(),
+  doubleKills: z.number(),
+  tripleKills: z.number(),
+  quadraKills: z.number(),
+  pentaKills: z.number(),
+  firstBlood: z.boolean(),
+  firstBloodAssist: z.boolean(),
+  firstTower: z.boolean(),
+  goldSpent: z.number(),
+  allyJungleFarm: z.number(),
+  enemyJungleFarm: z.number(),
+  objectiveSteals: z.number(),
+  healsToAllies: z.number(),
+  shieldsToAllies: z.number(),
+  baronKills: z.number(),
+  bountyLevel: z.number(),
+  killingSprees: z.number(),
+  gameSurrendered: z.boolean(),
+  killParticipation: z.number(),
+  csPerMinute: z.number(),
+  goldPerMinute: z.number(),
+  damagePerGold: z.number(),
 });
 
 export const MatchOverviewSchema: z.ZodType<MatchOverview> = z.object({
