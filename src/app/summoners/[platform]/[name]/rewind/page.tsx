@@ -15,6 +15,10 @@ import { useSummoner } from "~/hooks/useSummoner";
 import RewindQueueTypeSection from "~/components/rewind/RewindQueueTypeSection";
 import RewindInitialSection from "~/components/rewind/RewindInitialSection";
 import RewindGenerationSection from "~/components/rewind/RewindGenerationSection";
+import RewindPlaystyleSection from "~/components/rewind/RewindPlaystyleSection";
+import RewindStrengthsSection from "~/components/rewind/RewindStrengthsSection";
+import RewindWeaknessesSection from "~/components/rewind/RewindWeaknessesSection";
+import RewindAdviceSection from "~/components/rewind/RewindAdviceSection";
 
 type RewindStageType =
   | "initial"
@@ -88,7 +92,7 @@ const RewindPage = () => {
 
   useEffect(() => {
     if (existingRewind && stage === "generation") {
-      setStage("overview");
+      setStage("playstyle");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [existingRewind]);
@@ -118,6 +122,22 @@ const RewindPage = () => {
   );
 
   const handleGenerationOk = useCallback(() => {
+    setStage("playstyle");
+  }, []);
+
+  const handlePlaystyleNext = useCallback(() => {
+    setStage("strengths");
+  }, []);
+
+  const handleStrengthsNext = useCallback(() => {
+    setStage("weaknesses");
+  }, []);
+
+  const handleWeaknessesNext = useCallback(() => {
+    setStage("advice");
+  }, []);
+
+  const handleAdviceFinish = useCallback(() => {
     setStage("overview");
   }, []);
 
@@ -140,11 +160,83 @@ const RewindPage = () => {
           queueType={queueType ?? ""}
         />
       )}
-      {stage === "overview" && (
-        <div className="flex min-h-screen items-center justify-center">
+      {stage === "playstyle" &&
+        existingRewind?.playstyle &&
+        summoner.account &&
+        summoner.summoner &&
+        league.version && (
+          <RewindPlaystyleSection
+            playstyle={existingRewind.playstyle}
+            summoner={{
+              gameName: summoner.account.gameName ?? "",
+              tagLine: summoner.account.tagLine ?? "",
+              profileIconId: summoner.summoner.profileIconId,
+            }}
+            version={league.version.v}
+            onNext={handlePlaystyleNext}
+          />
+        )}
+      {stage === "strengths" &&
+        existingRewind?.gameplayElements &&
+        summoner.account &&
+        summoner.summoner &&
+        league.version && (
+          <RewindStrengthsSection
+            strengths={existingRewind.gameplayElements.filter(
+              (el) => el.form === "strength",
+            )}
+            summoner={{
+              gameName: summoner.account.gameName ?? "",
+              tagLine: summoner.account.tagLine ?? "",
+              profileIconId: summoner.summoner.profileIconId,
+            }}
+            version={league.version.v}
+            onNext={handleStrengthsNext}
+          />
+        )}
+      {stage === "weaknesses" &&
+        existingRewind?.gameplayElements &&
+        summoner.account &&
+        summoner.summoner &&
+        league.version && (
+          <RewindWeaknessesSection
+            weaknesses={existingRewind.gameplayElements.filter(
+              (el) => el.form === "weakness",
+            )}
+            summoner={{
+              gameName: summoner.account.gameName ?? "",
+              tagLine: summoner.account.tagLine ?? "",
+              profileIconId: summoner.summoner.profileIconId,
+            }}
+            version={league.version.v}
+            onNext={handleWeaknessesNext}
+          />
+        )}
+      {stage === "advice" &&
+        existingRewind?.advice &&
+        summoner.account &&
+        summoner.summoner &&
+        league.version && (
+          <RewindAdviceSection
+            advice={existingRewind.advice}
+            summoner={{
+              gameName: summoner.account.gameName ?? "",
+              tagLine: summoner.account.tagLine ?? "",
+              profileIconId: summoner.summoner.profileIconId,
+            }}
+            version={league.version.v}
+            onFinish={handleAdviceFinish}
+          />
+        )}
+      {stage === "overview" && existingRewind && (
+        <div className="flex min-h-screen items-center justify-center bg-neutral-50 dark:bg-neutral-950">
           <div className="text-center">
-            <h2 className="mb-4 text-2xl font-bold">Your Rewind</h2>
-            <p>{JSON.stringify(existingRewind)}</p>
+            <h2 className="mb-4 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+              Rewind Complete!
+            </h2>
+            <p className="text-neutral-700 dark:text-neutral-300">
+              Thank you for viewing your {new Date().getFullYear()} rewind.
+            </p>
           </div>
         </div>
       )}

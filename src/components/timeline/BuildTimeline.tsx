@@ -18,10 +18,10 @@ const BuildTimeline = ({ timeline, version }: BuildTimelineProps) => {
               key={frame.timestamp}
               className="relative flex flex-shrink-0 flex-col items-center"
             >
-              <div className="mt-2 text-sm text-slate-300">
+              <div className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
                 {getMatchTimestamp(frame.timestamp)}
               </div>
-              <div className="mt-1 flex min-w-[45px] flex-shrink-0 flex-wrap justify-center gap-2 rounded-lg bg-slate-900 p-2 shadow-md">
+              <div className="mt-1 flex min-w-[45px] flex-shrink-0 flex-wrap justify-center gap-2 rounded-lg bg-neutral-100 p-2 shadow-md dark:bg-neutral-900">
                 {frame.events.map((event, idx) => (
                   <div key={event.timestamp + idx} className="flex-shrink-0">
                     <Image
@@ -29,7 +29,7 @@ const BuildTimeline = ({ timeline, version }: BuildTimelineProps) => {
                       alt={event.itemId as string}
                       width={35}
                       height={35}
-                      className="h-8 w-8 flex-shrink-0 rounded border border-slate-600/50"
+                      className="h-8 w-8 flex-shrink-0 rounded border border-neutral-200 dark:border-neutral-800"
                     />
                   </div>
                 ))}

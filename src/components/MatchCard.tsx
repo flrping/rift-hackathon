@@ -55,7 +55,7 @@ const MatchCard = ({
   const redSide = match.info.participants.filter((team) => team.teamId === 200);
 
   return (
-    <div className="flex w-full max-w-full flex-col gap-3 overflow-hidden rounded-lg border border-slate-600/30 bg-slate-900/60 px-3 py-3 shadow-md transition-colors duration-200 sm:px-6 lg:px-8">
+    <div className="flex w-full max-w-full flex-col gap-3 overflow-hidden rounded-lg border border-neutral-100 bg-white px-3 py-3 transition-colors duration-200 sm:px-6 lg:px-8 dark:border-neutral-800 dark:bg-neutral-900">
       <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:gap-0">
         <MatchInfo
           queue={queue}
@@ -88,7 +88,7 @@ const MatchCard = ({
       </div>
 
       {isOpen && !isLoading && (
-        <div className="flex max-w-full min-w-0 flex-col gap-2 overflow-hidden rounded-lg border border-slate-600/30 bg-slate-800 px-3 py-3 sm:px-6 lg:px-8">
+        <div className="flex max-w-full min-w-0 flex-col gap-2 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100 px-3 py-3 sm:px-6 lg:px-8 dark:border-neutral-800 dark:bg-neutral-800">
           <TimelineSection
             participant={me!}
             timeline={timeline!}

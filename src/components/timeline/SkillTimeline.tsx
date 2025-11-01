@@ -44,9 +44,9 @@ const SkillTimeline = ({ timeline, version, champion }: SkillTimelineProps) => {
                         alt={spell.id}
                         width={24}
                         height={24}
-                        className="h-6 w-6 rounded border border-slate-600/50"
+                        className="h-6 w-6 rounded border border-neutral-200 dark:border-neutral-800"
                       />
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-neutral-600 dark:text-neutral-400">
                         {["Q", "W", "E", "R"][spellIndex]}
                       </span>
                     </>
@@ -64,8 +64,8 @@ const SkillTimeline = ({ timeline, version, champion }: SkillTimelineProps) => {
                         key={`${level}-${spellIndex}`}
                         className={`flex h-6 w-full items-center justify-center rounded border text-xs font-medium ${
                           isLeveled
-                            ? "border-slate-500 bg-slate-600 text-white"
-                            : "border-slate-600/50 bg-slate-800 text-slate-500"
+                            ? "border-rose-400 bg-rose-400 text-white dark:border-rose-500 dark:bg-rose-500"
+                            : "border-neutral-200 bg-neutral-100 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-400"
                         }`}
                       >
                         {isLeveled ? level : ""}

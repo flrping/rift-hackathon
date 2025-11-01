@@ -27,16 +27,18 @@ const MatchInfo = ({
         >
           {win ? "Victory" : "Defeat"}
         </h3>
-        <p className="mt-1 truncate text-sm font-medium text-slate-200 lg:text-center">
+        <p className="mt-1 truncate text-sm font-medium text-neutral-600 lg:text-center dark:text-neutral-400">
           {getQueueName(queue?.description ?? "")}
         </p>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-neutral-400 dark:text-neutral-500">
           {matchDurationMinutes}:
           {matchDurationSeconds.toString().padStart(2, "0")}
         </p>
       </div>
       <div className="flex flex-col items-end lg:items-center">
-        <p className="text-xs text-slate-400">{matchAge}</p>
+        <p className="text-xs text-neutral-400 dark:text-neutral-500">
+          {matchAge}
+        </p>
       </div>
     </div>
   );

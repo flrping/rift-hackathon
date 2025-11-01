@@ -34,7 +34,7 @@ const PlayerInfo = ({
           alt={participant.championName}
           width={PLAYER_ICON_SIZE}
           height={PLAYER_ICON_SIZE}
-          className="rounded-lg border border-slate-500/50"
+          className="rounded-lg border border-neutral-200 dark:border-neutral-800"
         />
       </div>
 
@@ -45,14 +45,14 @@ const PlayerInfo = ({
           alt={participant.championName}
           width={ITEM_ICON_SIZE}
           height={ITEM_ICON_SIZE}
-          className="flex rounded border border-slate-600/50 bg-slate-800"
+          className="flex rounded border border-neutral-200 bg-neutral-200/70 dark:border-neutral-800 dark:bg-neutral-800"
         />
         <Image
           src={`https://ddragon.leagueoflegends.com/cdn/${version.v}/img/spell/${summoner2?.id}.png`}
           alt={participant.championName}
           width={ITEM_ICON_SIZE}
           height={ITEM_ICON_SIZE}
-          className="flex rounded border border-slate-600/50 bg-slate-800"
+          className="flex rounded border border-neutral-200 bg-neutral-200/70 dark:border-neutral-800 dark:bg-neutral-800"
         />
       </div>
 
@@ -67,7 +67,7 @@ const PlayerInfo = ({
             return (
               <span
                 key={i}
-                className="flex rounded border border-slate-600/50 bg-slate-800"
+                className="flex rounded border border-neutral-200 bg-neutral-200/70 dark:border-neutral-800 dark:bg-neutral-800"
                 style={{ width: ITEM_ICON_SIZE, height: ITEM_ICON_SIZE }}
               />
             );
@@ -80,7 +80,7 @@ const PlayerInfo = ({
               alt={participant.championName}
               width={ITEM_ICON_SIZE}
               height={ITEM_ICON_SIZE}
-              className="rounded border border-slate-500/50"
+              className="rounded border border-neutral-200 dark:border-neutral-800"
             />
           );
         })}

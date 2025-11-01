@@ -20,9 +20,12 @@ const PlayerStats = ({
         <span className="text-red-400">{participant.deaths}</span> /{" "}
         <span className="text-blue-400">{participant.assists}</span>
       </div>
-      <div className="text-xs text-slate-300">
+      <div className="text-xs text-neutral-600 dark:text-neutral-400">
         <span className="whitespace-nowrap">
-          {totalCS} CS <span className="text-slate-400">({csPerMinute})</span>
+          {totalCS} CS{" "}
+          <span className="text-neutral-400 dark:text-neutral-500">
+            ({csPerMinute})
+          </span>
         </span>
       </div>
     </div>

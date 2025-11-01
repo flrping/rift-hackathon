@@ -1,29 +1,73 @@
+import { SiteNavbar } from "../SiteNavbar";
+import { SiteFooter } from "../SiteFooter";
+
 const RewindInitialSection = ({
   handleInitialOk,
 }: {
   handleInitialOk: () => void;
 }) => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-900 px-4 py-6 text-white md:px-20 lg:px-60">
-      <h1 className="mb-4 text-center text-4xl font-bold text-white">
-        Rift Rewind
-      </h1>
-      <p className="mb-12 text-center text-xl text-gray-200">
-        Welcome to Rift Rewind! Rift Rewind is a tool that helps you analyze
-        your match history and improve your gameplay.
-      </p>
-
-      <div className="flex flex-row gap-4">
-        <button
-          onClick={() => handleInitialOk()}
-          className="flex-1 rounded-lg border border-slate-600/30 bg-slate-700/50 p-4 hover:cursor-pointer hover:border-slate-400/50 hover:bg-slate-800/50"
-        >
-          <div className="text-left">
-            <div className="text-xl font-bold">Continue</div>
+    <>
+      <SiteNavbar />
+      <section className="relative min-h-screen bg-neutral-50 text-neutral-900 dark:bg-neutral-900 dark:text-white">
+        <div className="container mx-auto flex flex-col items-center justify-center gap-12 px-6 py-20 text-center">
+          {/* Hero Heading */}
+          <div className="max-w-3xl space-y-4 pt-30">
+            <h1 className="dark:text-rose-450 text-5xl font-extrabold tracking-tight text-rose-600 sm:text-[4rem]">
+              Rift Rewind
+            </h1>
+            <p className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">
+              Your AI-Powered Match Analysis Companion
+            </p>
+            <p className="text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
+              Rift Rewind uses advanced AI to analyze your League of Legends
+              match history and provide personalized insights. Discover your
+              gameplay patterns, strengths, and weaknesses to sharpen your
+              strategy and climb smarter.
+            </p>
           </div>
-        </button>
-      </div>
-    </div>
+
+          {/* Feature Cards */}
+          <div className="grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: "Smart Analysis",
+                desc: "AI reviews your performance to reveal trends across champions, roles, and playstyles.",
+              },
+              {
+                title: "Personalized Insights",
+                desc: "Understand what you excel at and receive tailored feedback for areas to improve.",
+              },
+              {
+                title: "Actionable Tips",
+                desc: "Practical, data-driven advice you can apply in your next match to improve instantly.",
+              },
+            ].map(({ title, desc }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md dark:border-neutral-700 dark:bg-neutral-800/60"
+              >
+                <h3 className="mb-2 text-lg font-semibold text-rose-600 dark:text-rose-400">
+                  {title}
+                </h3>
+                <p className="text-sm text-neutral-700 dark:text-neutral-300">
+                  {desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA Button */}
+          <button
+            onClick={handleInitialOk}
+            className="mt-4 rounded-lg bg-rose-600 px-8 py-3 text-lg font-semibold text-white shadow-sm transition-all hover:bg-rose-700 focus:ring-2 focus:ring-rose-300 dark:focus:ring-rose-700"
+          >
+            Start Your Rewind
+          </button>
+        </div>
+      </section>
+      <SiteFooter />
+    </>
   );
 };
 

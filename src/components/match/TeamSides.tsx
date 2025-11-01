@@ -37,7 +37,7 @@ const TeamSides = ({
             />
             <Link
               href={`/summoners/${platform}/${participant.riotIdGameName}-${participant.riotIdTagline}`}
-              className="max-w-[60px] min-w-0 truncate text-xs text-slate-300 hover:text-slate-100 lg:max-w-[80px]"
+              className="max-w-[60px] min-w-0 truncate text-xs text-neutral-600 hover:text-rose-500 lg:max-w-[80px] dark:text-neutral-400 dark:hover:text-rose-400"
               title={participant.riotIdGameName}
             >
               {participant.riotIdGameName}
@@ -60,7 +60,7 @@ const TeamSides = ({
             />
             <Link
               href={`/summoners/${platform}/${participant.riotIdGameName}-${participant.riotIdTagline}`}
-              className="max-w-[60px] min-w-0 truncate text-xs text-slate-300 hover:text-slate-100 lg:max-w-[80px]"
+              className="max-w-[60px] min-w-0 truncate text-xs text-neutral-600 hover:text-rose-500 lg:max-w-[80px] dark:text-neutral-400 dark:hover:text-rose-400"
               title={participant.riotIdGameName}
             >
               {participant.riotIdGameName}

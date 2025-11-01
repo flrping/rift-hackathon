@@ -8,7 +8,7 @@ const TimelineToggle = ({ isOpen, onToggle }: TimelineToggleProps) => {
     <div className="flex items-center justify-end lg:ms-auto lg:justify-center">
       <button
         onClick={onToggle}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-slate-600/50 bg-slate-700/50 text-slate-300 transition-colors hover:bg-slate-600/50 hover:text-slate-100"
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md border border-neutral-200 bg-neutral-200/70 text-neutral-500 transition-colors hover:bg-neutral-200 hover:text-neutral-100 dark:border-neutral-800 dark:bg-neutral-800 dark:text-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-neutral-300"
       >
         <svg
           className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
