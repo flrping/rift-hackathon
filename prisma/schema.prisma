@@ -23,6 +23,8 @@ model Rewind {
   playstyleId      Int               @unique
   gameplayElements GameplayElement[]
   advice           Advice[]
+  highlights       Highlight[]
+  achievements     Achievement[]
 
   @@unique([puuid, platform, queueType, year])
 }
@@ -49,6 +51,37 @@ model Advice {
   id     Int    @id @default(autoincrement())
   type   String
   reason String
+
+  Rewind   Rewind? @relation(fields: [rewindId], references: [id])
+  rewindId Int?
+}
+
+model Highlight {
+  id          Int    @id @default(autoincrement())
+  type        String
+  reason      String
+  matchId     String
+  title       String
+  description String
+  badge       String
+  rarity      String
+  statsJson   Json
+
+  Rewind   Rewind? @relation(fields: [rewindId], references: [id])
+  rewindId Int?
+}
+
+model Achievement {
+  id          Int     @id @default(autoincrement())
+  type        String
+  reason      String
+  title       String
+  description String
+  icon        String
+  rarity      String
+  unlocked    Boolean @default(false)
+  progress    Int?
+  total       Int?
 
   Rewind   Rewind? @relation(fields: [rewindId], references: [id])
   rewindId Int?

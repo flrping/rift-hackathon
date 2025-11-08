@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import { api } from "~/trpc/react";
 import type { MatchOverview, Match } from "~/types/riot";
 import {
@@ -10,6 +16,7 @@ import {
   QUEUE_IDS,
 } from "~/util/riot/game";
 import type { ItemData } from "~/types/riot";
+import { detectHighlightGames, generateAchievements } from "~/util/riot/game";
 
 interface RewindGenerationSectionProps {
   handleGenerationOk: () => void;
@@ -17,6 +24,8 @@ interface RewindGenerationSectionProps {
   platform: string;
   queueType: CommonQueueType;
   items?: ItemData;
+  matches: Match[];
+  setMatches: Dispatch<SetStateAction<Match[]>>;
 }
 
 const RewindGenerationSection = ({
@@ -25,6 +34,8 @@ const RewindGenerationSection = ({
   platform,
   queueType,
   items,
+  matches: _matches,
+  setMatches,
 }: RewindGenerationSectionProps) => {
   const sendQuery = api.aws.sendQuery.useMutation();
   const createRewind = api.rewind.createRewind.useMutation();
@@ -95,6 +106,7 @@ const RewindGenerationSection = ({
         } else if (data.type === "complete" && data.matches) {
           setAllMatchData(data.matches);
           setIsLoadingMatches(false);
+          setMatches(data.matches);
         } else if (data.type === "error") {
           setIsLoadingMatches(false);
         }
@@ -105,7 +117,7 @@ const RewindGenerationSection = ({
     },
   );
 
-  const [matches, setMatches] = useState<
+  const [structuredMatches, setStructuredMatches] = useState<
     { month: string; performances: MatchOverview[] }[]
   >([]);
 
@@ -117,21 +129,21 @@ const RewindGenerationSection = ({
         puuid,
         items,
       ).filter((match) => match.performances.length > 0);
-      setMatches(restructuredData);
+      setStructuredMatches(restructuredData);
     }
   }, [allMatchData, matchIdsByMonth, puuid, items]);
 
   useEffect(() => {
     if (
-      matches.length &&
+      structuredMatches.length &&
       !isLoadingMatches &&
       !hasSentQuery.current &&
       !sendQuery.isPending
     ) {
       hasSentQuery.current = true;
-      sendQuery.mutate(matches);
+      sendQuery.mutate(structuredMatches);
     }
-  }, [matches, isLoadingMatches, sendQuery]);
+  }, [structuredMatches, isLoadingMatches, sendQuery]);
 
   useEffect(() => {
     if (
@@ -140,15 +152,39 @@ const RewindGenerationSection = ({
       !createRewind.isPending
     ) {
       hasCreatedRewind.current = true;
+      const highlights = detectHighlightGames(allMatchData, puuid).map((h) => ({
+        type: h.type,
+        matchId: h.matchId,
+        title: h.title,
+        description: h.description,
+        badge: h.badge,
+        rarity: h.rarity,
+        statsJson: h.stats,
+        reason: h.description,
+      }));
+      const achievements = generateAchievements(allMatchData, puuid).map(
+        (a) => ({
+          id: a.id,
+          title: a.title,
+          description: a.description,
+          icon: a.icon,
+          rarity: a.rarity,
+          unlocked: a.unlocked,
+          progress: a.progress,
+          total: a.total,
+        }),
+      );
       createRewind.mutate({
         puuid,
         platform,
         queueType,
         year: new Date().getFullYear(),
         data: sendQuery.data,
+        highlights,
+        achievements,
       });
     }
-  }, [sendQuery.data, createRewind, puuid, platform, queueType]);
+  }, [sendQuery.data, createRewind, puuid, platform, queueType, allMatchData]);
 
   useEffect(() => {
     if (createRewind.data) {
@@ -157,9 +193,9 @@ const RewindGenerationSection = ({
   }, [createRewind.data, handleGenerationOk]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h2 className="mb-4 text-2xl font-bold">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 px-4 py-6 md:px-20 lg:px-40 dark:bg-neutral-950">
+      <div className="w-full max-w-4xl text-center">
+        <h2 className="mb-4 text-2xl font-bold text-neutral-900 dark:text-neutral-100">
           {isLoadingMatches &&
             `Loading matches... (${allMatchData.length}/${idsRef.current.length})`}
           {sendQuery.isPending && "Analyzing your gameplay..."}

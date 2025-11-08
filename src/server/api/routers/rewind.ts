@@ -71,6 +71,28 @@ export const QueryResponseSchema: z.ZodType<QueryResponse> = z.object({
   ),
 });
 
+const HighlightInputSchema = z.object({
+  type: z.string(),
+  matchId: z.string(),
+  title: z.string(),
+  description: z.string(),
+  badge: z.string(),
+  rarity: z.string(),
+  statsJson: z.any(),
+  reason: z.string().optional(),
+});
+
+const AchievementInputSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  icon: z.string(),
+  rarity: z.string(),
+  unlocked: z.boolean(),
+  progress: z.number().optional(),
+  total: z.number().optional(),
+});
+
 export const rewindRouter = createTRPCRouter({
   getExistingRewind: publicProcedure
     .input(
@@ -95,6 +117,8 @@ export const rewindRouter = createTRPCRouter({
           gameplayElements: true,
           advice: true,
           playstyle: true,
+          highlights: true,
+          achievements: true,
         },
       });
     }),
@@ -107,6 +131,8 @@ export const rewindRouter = createTRPCRouter({
         queueType: z.string(),
         year: z.number().int(),
         data: QueryResponseSchema,
+        highlights: z.array(HighlightInputSchema).optional(),
+        achievements: z.array(AchievementInputSchema).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -154,10 +180,41 @@ export const rewindRouter = createTRPCRouter({
               reason: advice.reason,
             })),
           },
+          highlights: input.highlights
+            ? {
+                create: input.highlights.map((h) => ({
+                  type: h.type,
+                  reason: h.description ?? "",
+                  matchId: h.matchId,
+                  title: h.title,
+                  description: h.description,
+                  badge: h.badge,
+                  rarity: h.rarity,
+                  statsJson: h.statsJson,
+                })),
+              }
+            : undefined,
+          achievements: input.achievements
+            ? {
+                create: input.achievements.map((a) => ({
+                  type: a.id,
+                  reason: a.description,
+                  title: a.title,
+                  description: a.description,
+                  icon: a.icon,
+                  rarity: a.rarity,
+                  unlocked: a.unlocked,
+                  progress: a.progress,
+                  total: a.total,
+                })),
+              }
+            : undefined,
         },
         include: {
           gameplayElements: true,
           advice: true,
+          highlights: true,
+          achievements: true,
         },
       });
     }),

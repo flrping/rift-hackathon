@@ -118,3 +118,60 @@ export const GameplayElement = {
       "Frequent deaths give the enemy gold and momentum, weakening your entire team.",
   },
 };
+
+export interface HighlightGame {
+  matchId: string;
+  type:
+    | "best_kda"
+    | "pentakill"
+    | "epic_comeback"
+    | "perfect_game"
+    | "high_damage"
+    | "most_kills"
+    | "fastest_win"
+    | "clutch_baron";
+  title: string;
+  description: string;
+  stats: {
+    kda?: number;
+    kills?: number;
+    deaths?: number;
+    assists?: number;
+    damage?: number;
+    duration?: number;
+    goldDeficit?: number;
+    multiKills?: string;
+  };
+  badge: string;
+  rarity: "legendary" | "epic" | "rare" | "common";
+}
+
+export interface PlayerHighlights {
+  bestGames: HighlightGame[];
+  achievements: Achievement[];
+  records: Record<string, number>;
+  clutchMoments: string[];
+}
+
+export interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  rarity: "legendary" | "epic" | "rare" | "common";
+  unlocked: boolean;
+  progress?: number;
+  total?: number;
+}
+
+export interface PlayerRecords {
+  totalGames: number;
+  totalWins: number;
+  highestKills: number;
+  highestDamage: number;
+  highestVisionScore: number;
+  mostControlWardsPlaced: number;
+  longestGame: number;
+  shortestWin: number;
+  winRate: number;
+}

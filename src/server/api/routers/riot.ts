@@ -17,7 +17,7 @@ import type {
 } from "~/types/riot";
 import { SimpleCache } from "~/util/cache/cache";
 import { getRegion } from "~/util/riot/region";
-import { riotRateLimiter } from "~/util/rateLimiter";
+import { riotRateLimiter } from "~/util/limiter/rateLimiter";
 import { observable } from "@trpc/server/observable";
 
 const CACHE_TTL = 1000 * 60 * 60 * 24;
