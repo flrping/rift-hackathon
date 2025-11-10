@@ -19,12 +19,21 @@ model Rewind {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  favoriteLane           String?
+  favoriteChampion       String?
+  favoriteItem           String?
+  favoriteStarter        String?
+  highestWinrateChampion String?
+  nemesisChampion        String?
+  bullyChampion          String?
+
   playstyle        Playstyle         @relation(fields: [playstyleId], references: [id])
   playstyleId      Int               @unique
   gameplayElements GameplayElement[]
   advice           Advice[]
   highlights       Highlight[]
   achievements     Achievement[]
+  showcase         ShowcaseCard?
 
   @@unique([puuid, platform, queueType, year])
 }
@@ -85,4 +94,15 @@ model Achievement {
 
   Rewind   Rewind? @relation(fields: [rewindId], references: [id])
   rewindId Int?
+}
+
+model ShowcaseCard {
+  id              Int      @id @default(autoincrement())
+  champion        String?
+  skinNum         Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  rewind   Rewind @relation(fields: [rewindId], references: [id])
+  rewindId Int    @unique
 }

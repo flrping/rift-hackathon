@@ -1,32 +1,38 @@
 import Image from "next/image";
 import type { Dispatch, SetStateAction } from "react";
 import type { Match } from "~/types/riot";
-import { formatPlaystyleType } from "~/util/formatNames";
 
-interface RewindAdviceSectionProps {
-  advice: Array<{
-    type: string;
-    reason: string;
-  }>;
+interface RewindStatisticSectionProps {
+  title: string;
+  description: string;
+  statValue: string;
+  statLabel: string;
+  percentage?: number;
+  percentageText?: string;
   summoner: {
     gameName: string;
     tagLine: string;
     profileIconId: number;
   };
   version: string;
-  onFinish: () => void;
+  onNext: () => void;
   matches: Match[];
   setMatches: Dispatch<SetStateAction<Match[]>>;
 }
 
-const RewindAdviceSection = ({
-  advice,
+const RewindStatisticSection = ({
+  title,
+  description,
+  statValue,
+  statLabel,
+  percentage,
+  percentageText,
   summoner,
   version,
-  onFinish,
+  onNext,
   matches: _matches,
   setMatches: _setMatches,
-}: RewindAdviceSectionProps) => {
+}: RewindStatisticSectionProps) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-start bg-neutral-50 px-4 pt-10 pb-8 md:px-20 lg:px-40 dark:bg-neutral-950">
       <div className="absolute top-25 right-8 flex items-center gap-2">
@@ -48,38 +54,40 @@ const RewindAdviceSection = ({
       <div className="flex w-full max-w-4xl flex-col items-center gap-8">
         <div className="mt-10 text-center">
           <h1 className="mb-4 text-5xl font-extrabold tracking-tight text-rose-600 sm:text-[4rem] dark:text-rose-500">
-            Tips for Improvement
+            {title}
           </h1>
           <p className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
-            Here are some tips to help you improve your game sense and play.
+            {description}
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-4">
-          {advice.map((item, index) => (
-            <div
-              key={index}
-              className="rounded-xl border border-neutral-300 bg-white p-6 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
-            >
-              <h3 className="mb-3 text-xl font-semibold text-rose-500 dark:text-rose-400">
-                {formatPlaystyleType(item.type)}
-              </h3>
-              <p className="text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
-                {item.reason}
-              </p>
-            </div>
-          ))}
+        <div className="w-full rounded-xl border border-neutral-300 bg-white p-8 shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+          <p className="text-center text-lg leading-relaxed text-neutral-700 dark:text-neutral-300">
+            {statLabel}:{" "}
+            <span className="font-bold text-rose-500 dark:text-rose-400">
+              {statValue}
+            </span>
+            {percentage !== undefined && percentageText && (
+              <>
+                <br />
+                <br />
+                <span className="text-neutral-700 dark:text-neutral-300">
+                  {percentageText}
+                </span>
+              </>
+            )}
+          </p>
         </div>
 
         <button
-          onClick={onFinish}
+          onClick={onNext}
           className="mt-8 rounded-lg border border-neutral-300 bg-rose-400 px-8 py-3 text-lg font-medium text-white shadow-lg transition-all hover:bg-rose-500 dark:border-neutral-700 dark:bg-rose-500 dark:hover:bg-rose-600"
         >
-          Finish
+          Continue
         </button>
       </div>
     </div>
   );
 };
 
-export default RewindAdviceSection;
+export default RewindStatisticSection;

@@ -119,6 +119,7 @@ export const rewindRouter = createTRPCRouter({
           playstyle: true,
           highlights: true,
           achievements: true,
+          showcase: true,
         },
       });
     }),
@@ -133,6 +134,13 @@ export const rewindRouter = createTRPCRouter({
         data: QueryResponseSchema,
         highlights: z.array(HighlightInputSchema).optional(),
         achievements: z.array(AchievementInputSchema).optional(),
+        favoriteLane: z.string().optional(),
+        favoriteChampion: z.string().optional(),
+        favoriteItem: z.string().optional(),
+        favoriteStarter: z.string().optional(),
+        highestWinrateChampion: z.string().optional(),
+        nemesisChampion: z.string().optional(),
+        bullyChampion: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -161,6 +169,13 @@ export const rewindRouter = createTRPCRouter({
           platform: input.platform,
           queueType: input.queueType,
           year: input.year,
+          favoriteLane: input.favoriteLane,
+          favoriteChampion: input.favoriteChampion,
+          favoriteItem: input.favoriteItem,
+          favoriteStarter: input.favoriteStarter,
+          highestWinrateChampion: input.highestWinrateChampion,
+          nemesisChampion: input.nemesisChampion,
+          bullyChampion: input.bullyChampion,
           playstyle: {
             create: {
               type: input.data.playstyle.type,
@@ -190,6 +205,7 @@ export const rewindRouter = createTRPCRouter({
                   description: h.description,
                   badge: h.badge,
                   rarity: h.rarity,
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                   statsJson: h.statsJson,
                 })),
               }
@@ -217,5 +233,104 @@ export const rewindRouter = createTRPCRouter({
           achievements: true,
         },
       });
+    }),
+
+  upsertShowcase: publicProcedure
+    .input(
+      z.object({
+        puuid: z.string(),
+        platform: z.string(),
+        queueType: z.string(),
+        year: z.number().int(),
+        champion: z.string().optional(),
+        skinNum: z.number().int().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const rewind = await ctx.db.rewind.findUnique({
+        where: {
+          puuid_platform_queueType_year: {
+            puuid: input.puuid,
+            platform: input.platform,
+            queueType: input.queueType,
+            year: input.year,
+          },
+        },
+        select: { id: true },
+      });
+
+      if (!rewind) {
+        throw new Error("Rewind not found for the given identifiers");
+      }
+
+      const createData: Record<string, unknown> = {
+        rewindId: rewind.id,
+        champion: input.champion ?? undefined,
+        skinNum: input.skinNum ?? undefined,
+      };
+      const updateData: Record<string, unknown> = {
+        champion: input.champion ?? undefined,
+        skinNum: input.skinNum ?? undefined,
+      };
+      const result: unknown = await (
+        ctx.db as unknown as {
+          showcaseCard: { upsert: (args: unknown) => unknown };
+        }
+      ).showcaseCard.upsert({
+        where: { rewindId: rewind.id },
+        create: createData,
+        update: updateData,
+      });
+      return result;
+    }),
+
+  getGlobalStats: publicProcedure
+    .input(
+      z.object({
+        year: z.number().int(),
+        queueType: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const allRewinds = await ctx.db.rewind.findMany({
+        where: {
+          year: input.year,
+          queueType: input.queueType,
+        },
+        select: {
+          favoriteChampion: true,
+          favoriteLane: true,
+          favoriteItem: true,
+          favoriteStarter: true,
+          highestWinrateChampion: true,
+          nemesisChampion: true,
+          bullyChampion: true,
+        },
+      });
+
+      const totalCount = allRewinds.length;
+      if (totalCount === 0) return null;
+
+      const countField = (field: keyof (typeof allRewinds)[0]) => {
+        const counts = new Map<string, number>();
+        allRewinds.forEach((r) => {
+          const value = r[field];
+          if (value && typeof value === "string") {
+            counts.set(value, (counts.get(value) ?? 0) + 1);
+          }
+        });
+        return counts;
+      };
+
+      return {
+        totalCount,
+        favoriteChampion: countField("favoriteChampion"),
+        favoriteLane: countField("favoriteLane"),
+        favoriteItem: countField("favoriteItem"),
+        favoriteStarter: countField("favoriteStarter"),
+        highestWinrateChampion: countField("highestWinrateChampion"),
+        nemesisChampion: countField("nemesisChampion"),
+        bullyChampion: countField("bullyChampion"),
+      };
     }),
 });

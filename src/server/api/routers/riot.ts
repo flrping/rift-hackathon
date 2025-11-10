@@ -162,7 +162,7 @@ export const riotRouter = createTRPCRouter({
             month: z.number().int(),
           }),
         ),
-        count: z.number().default(20).optional(),
+        count: z.number().default(10).optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -174,10 +174,21 @@ export const riotRouter = createTRPCRouter({
 
       const results: { month: number; matches: string[] }[] = [];
 
-      for (const m of input.months) {
-        const cacheKey = `${input.id}-${input.platform}-${m.startTime}-${m.endTime}-${input.count}`;
+      // Process months from old -> new to allow newer months to make up debt
+      const monthsAsc = [...input.months].sort(
+        (a, b) => a.startTime - b.startTime,
+      );
+
+      const baseline = input.count ?? 10;
+      let debt = 0;
+
+      for (const m of monthsAsc) {
+        // Each Riot call is capped at 100. Debt can exceed 100 and will carry forward.
+        const desiredCount = Math.min(100, baseline + debt);
+
+        const cacheKey = `${input.id}-${input.platform}-${m.startTime}-${m.endTime}-${desiredCount}-${input.queue ?? "all"}`;
         const matches = await matchesCache.getOrLoad(cacheKey, async () => {
-          let url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.id}/ids?count=${input.count}&startTime=${m.startTime}&endTime=${m.endTime}`;
+          let url = `https://${region}.api.riotgames.com/lol/match/v5/matches/by-puuid/${input.id}/ids?count=${desiredCount}&startTime=${m.startTime}&endTime=${m.endTime}`;
           if (input.queue !== undefined && input.queue !== -1) {
             url += `&queue=${input.queue}`;
           }
@@ -191,6 +202,15 @@ export const riotRouter = createTRPCRouter({
           }
           return (await res.json()) as string[];
         });
+
+        // Request debt accumulation and repayment linearly.
+        const obtained = matches.length;
+        if (obtained < baseline) {
+          debt += baseline - obtained;
+        } else if (obtained > baseline) {
+          const over = obtained - baseline;
+          debt = Math.max(0, debt - over);
+        }
 
         results.push({ month: m.month, matches });
       }

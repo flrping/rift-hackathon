@@ -101,14 +101,14 @@ export const getMonthlyRanges = (year: number) => {
   const ranges: { month: number; startTime: number; endTime: number }[] = [];
 
   for (let month = 0; month < 12; month++) {
-    const start = new Date(year, month, 1, 0, 0, 0, 0);
-    const end = new Date(year, month + 1, 1, 0, 0, 0, 0);
-    end.setMilliseconds(end.getMilliseconds() - 1);
+    // Use UTC boundaries to avoid timezone/DST shifting months for start/end
+    const startUtcMs = Date.UTC(year, month, 1, 0, 0, 0, 0);
+    const endUtcMs = Date.UTC(year, month + 1, 1, 0, 0, 0, 0) - 1;
 
     ranges.push({
       month: month + 1,
-      startTime: Math.floor(start.getTime() / 1000),
-      endTime: Math.floor(end.getTime() / 1000),
+      startTime: Math.floor(startUtcMs / 1000),
+      endTime: Math.floor(endUtcMs / 1000),
     });
   }
 
@@ -312,7 +312,6 @@ export function detectHighlightGames(
   let bestKDA = 0;
   let highestDamage = 0;
   let mostKills = 0;
-  let fastestWin = Infinity;
   const comebackGames: Match[] = [];
 
   matches.forEach((match) => {
@@ -336,10 +335,6 @@ export function detectHighlightGames(
 
     if (me.kills > mostKills) {
       mostKills = me.kills;
-    }
-
-    if (me.win && match.info.gameDuration < fastestWin) {
-      fastestWin = match.info.gameDuration;
     }
 
     if (me.pentaKills > 0) {
@@ -490,36 +485,6 @@ export function detectHighlightGames(
           assists: me.assists,
         },
         badge: "🗡️",
-        rarity: "rare",
-      });
-    }
-  }
-
-  if (fastestWin !== Infinity) {
-    const fastestWinMatch = matches.find((m) => {
-      const me = m.info.participants.find(
-        (p: Participant) => p.puuid === puuid,
-      );
-      return me ? me.win && m.info.gameDuration === fastestWin : false;
-    });
-    if (fastestWinMatch) {
-      const me = fastestWinMatch.info.participants.find(
-        (p: Participant) => p.puuid === puuid,
-      )!;
-      const minutes = Math.floor(fastestWin / 60);
-      highlights.push({
-        matchId: fastestWinMatch.metadata.matchId,
-        type: "fastest_win",
-        title: "Speed Run",
-        description: `Lightning-fast victory in just ${minutes} minutes!`,
-        stats: {
-          duration: fastestWin,
-          kda:
-            me.deaths === 0
-              ? me.kills + me.assists
-              : (me.kills + me.assists) / me.deaths,
-        },
-        badge: "⚡",
         rarity: "rare",
       });
     }

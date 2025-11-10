@@ -1,6 +1,7 @@
 import Image from "next/image";
 import type { Dispatch, SetStateAction } from "react";
 import type { Match } from "~/types/riot";
+import { formatPlaystyleType } from "~/util/formatNames";
 
 interface RewindWeaknessesSectionProps {
   weaknesses: Array<{
@@ -27,8 +28,8 @@ const RewindWeaknessesSection = ({
   setMatches: _setMatches,
 }: RewindWeaknessesSectionProps) => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-neutral-50 px-4 py-6 md:px-20 lg:px-40 dark:bg-neutral-950">
-      <div className="absolute top-20 right-4 flex items-center gap-2">
+    <div className="flex min-h-screen flex-col items-center justify-start bg-neutral-50 px-4 pt-10 pb-8 md:px-20 lg:px-40 dark:bg-neutral-950">
+      <div className="absolute top-25 right-8 flex items-center gap-2">
         <Image
           src={`https://ddragon.leagueoflegends.com/cdn/${version}/img/profileicon/${summoner.profileIconId}.png`}
           alt="Summoner Icon"
@@ -45,8 +46,8 @@ const RewindWeaknessesSection = ({
       </div>
 
       <div className="flex w-full max-w-4xl flex-col items-center gap-8">
-        <div className="text-center">
-          <h1 className="dark:text-rose-450 mb-4 text-5xl font-extrabold tracking-tight text-rose-600 sm:text-[4rem]">
+        <div className="mt-10 text-center">
+          <h1 className="mb-4 text-5xl font-extrabold tracking-tight text-rose-600 sm:text-[4rem] dark:text-rose-500">
             Your Struggles
           </h1>
           <p className="mb-4 text-xl font-semibold text-neutral-900 dark:text-neutral-100">
@@ -62,7 +63,7 @@ const RewindWeaknessesSection = ({
               className="rounded-xl border border-neutral-300 bg-white p-6 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
             >
               <h3 className="mb-3 text-xl font-semibold text-rose-500 dark:text-rose-400">
-                {weakness.type}
+                {formatPlaystyleType(weakness.type)}
               </h3>
               <p className="text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
                 {weakness.reason}

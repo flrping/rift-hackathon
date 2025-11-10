@@ -75,13 +75,19 @@ Support: Vision score (40+ excellent), warding/denial, peel metrics (shieldsToAl
 
 OUTPUT REQUIREMENTS:
 
-1. Use only predefined Playstyle Types and Gameplay Elements
+1. Use only predefined Playstyle Types and Gameplay Elements, DO NOT create new ones.
 2. Output ONLY valid JSON matching the exact template format
 3. Provide specific, data-backed reasons citing actual metrics
 4. Identify 2-3 clear win/loss patterns with supporting data
 5. Give actionable advice with expected impact
 6. Consider most-played lane/role for context
 7. Ignore low sample size outliers (< 5 games)
+8. Only gameplay elements should be used for strengths and weaknesses, DO NOT create new ones.
+9. Ensure the reasoning for each analysis is grammatically correct, even the variable names. Example: visionScore should be "Vision Score" or "vision score" not "visionScore".
+10. Do not create new playstyle types, only use the ones provided.
+11. Do not create new gameplay elements, only use the ones provided.
+12. Do not send back a damage gameplay element or playstyle type.
+13. There is no need to include variable names in the reasoning. Example: "Damage to objectives (damageToObjectives) is consistently high" should just be "Damage to objectives is consistently high".
 
 Playstyle Types:
 {{ PLAYSTYLE_TYPES }}
